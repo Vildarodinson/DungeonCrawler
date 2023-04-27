@@ -1,15 +1,12 @@
-// Get canvas element and context
 const canvas = document.getElementById('game-board');
 const ctx = canvas.getContext('2d');
 
-// Set canvas dimensions
 canvas.width = 800;
 canvas.height = 600;
 
 let playerX = 50;
 let playerY = 50;
 
-// Define a function that generates a random number within a range
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -25,63 +22,73 @@ function createEnemy() {
 
 setInterval(createEnemy, 2000);
 
+let score = 0;
+
 document.addEventListener('keydown', event => {
   switch (event.key) {
     case 'ArrowLeft':
-      playerX -= 10;
+      if (playerX - 10 >= 0) {
+        playerX -= 10;
+      }
       break;
     case 'ArrowRight':
-      playerX += 10;
+      if (playerX + 110 <= canvas.width) {
+        playerX += 10;
+      }
       break;
     case 'ArrowUp':
-      playerY -= 10;
+      if (playerY - 10 >= 0) {
+        playerY -= 10;
+      }
       break;
     case 'ArrowDown':
-      playerY += 10;
+      if (playerY + 110 <= canvas.height) {
+        playerY += 10;
+      }
       break;
   }
 });
 
-// Start game loop
 function gameLoop() {
-  // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Update game state
-  // ...
-
-  // Draw game objects
   ctx.fillStyle = 'red';
   ctx.fillRect(playerX, playerY, 100, 100);
 
   for (let i = 0; i < enemies.length; i++) {
     enemies[i].draw();
-  }
 
-  for (let i = 0; i < enemies.length; i++) {
     let enemy = enemies[i];
 
-    // Check for collision
     if (playerX + 100 > enemy.x &&
-      playerX < enemy.x + enemy.size &&
-      playerY + 100 > enemy.y &&
-      playerY < enemy.y + enemy.size) {
-      // Collision detected! End the game.
+        playerX < enemy.x + enemy.size &&
+        playerY + 100 > enemy.y &&
+        playerY < enemy.y + enemy.size) {
       alert('Game over!');
-      // Reload the page to start a new game
       location.reload();
-      }
+    }
 
-    // Update enemy position
-    enemy.x -= enemy.speed;
-    if (enemy.x < -enemy.size) {
-      // Enemy has gone off screen, remove it from the array
-      enemies.splice(i, 1);
-      i--;
+    if (playerX < 0 || playerX + 100 > canvas.width || playerY < 0 || playerY + 100 > canvas.height) {
+      // Player hit the border, don't update the enemy's position
+    } else {
+      enemy.x -= enemy.speed;
+      if (enemy.x < -enemy.size) {
+        enemies.splice(i, 1);
+        i--;
+
+        score++;
+        if (score > localStorage.getItem('highScore')) {
+          localStorage.setItem('highScore', score);
+        }
+      }
     }
   }
 
-  // Schedule the next frame
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "white";
+  ctx.fillText(`Score: ${score}`, 10, 50);
+  ctx.fillText(`High Score: ${localStorage.getItem('highScore')}`, 10, 90);
+
   requestAnimationFrame(gameLoop);
 }
 
