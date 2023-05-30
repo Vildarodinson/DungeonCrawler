@@ -1,2 +1,2 @@
-# DungeonCrawler
-dungeon crawler game
+#Js Game
+Simple Javascript Game
